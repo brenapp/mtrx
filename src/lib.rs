@@ -303,13 +303,21 @@ impl<T: MatrixCell<T>, const R: usize> Matrix<T, R, R> {
         Matrix { inner }
     }
 
-    pub fn pow(exp: usize) -> Matrix<T, R, R> {
-        
+    pub fn pow(&self, exp: usize) -> Matrix<T, R, R> {
+
         // By convention matrix to the power of zero is the identity matrix
         if exp == 0 {
             Matrix::identity()
+
+        // Otherwise, multiply the matrix by itself exp times 
         } else {
-            Matrix::identity()
+            let mut matrix = self.clone();
+
+            for _ in 1..exp {
+                matrix = matrix * matrix;
+            };
+            
+            matrix
         }
     }
 
