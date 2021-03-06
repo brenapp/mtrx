@@ -69,7 +69,6 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 
     /// Performs the dot product with the row of this matrix and the column of the given matrix,
     /// used in matrix multiplication
-    /// 
     fn dot_product<const K: usize>(&self, row: usize, matrix: Matrix<T, C, K>, col: usize) -> T {
 
         // Initialize sum with the first value so that we never have to initialize it with zero, which can be difficult with generic numeric types
@@ -126,6 +125,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     }
 
 
+    /// Adds two matrices of the same size and returns the sum matrix (also the same size)
     pub fn add_matrix(&self, other: Matrix<T, R, C>) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -138,6 +138,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
         Matrix { inner }
     }
 
+    /// Adds a single value to all cells in the matrix and returns the sum matrix
     pub fn add_value(&self, other: T) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -150,6 +151,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
         Matrix { inner }
     }
 
+    /// Adds two matrices of the same size and returns the resultant matrix (also the same size)
     pub fn sub_matrix(&self, other: Matrix<T, R, C>) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -162,6 +164,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
         Matrix { inner }
     }
 
+    /// Adds a single value to all cells in the matrix and returns the sum matrix
     pub fn sub_value(&self, other: T) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -213,6 +216,8 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 }
 
 
+/// Trait Implementations
+
 impl<T: MatrixCell<T>, const R: usize, const C: usize> Add for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
     
@@ -222,8 +227,8 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Add for Matrix<T, R, C> {
 }
 
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Add<T> for Matrix<T, { R }, { C }> {
-    type Output = Matrix<T, { R }, { C }>;
+impl<T: MatrixCell<T>, const R: usize, const C: usize> Add<T> for Matrix<T, R, C> {
+    type Output = Matrix<T, R, C>;
 
     fn add(self, other: T) -> Self {
         self.add_value(other)
@@ -247,6 +252,35 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub for Matrix<T, R, C> {
 
         Matrix { inner }
 
+    }
+}
+
+impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub<T> for Matrix<T, R, C> {
+    type Output = Matrix<T, R, C>;
+
+    fn sub(self, other: T) -> Self {
+        self.sub_value(other)
+    }
+
+}
+
+
+impl<T: MatrixCell<T>, const R: usize, const C: usize, const K: usize> Mul<Matrix<T, C, K>> for Matrix<T, R, C> {
+    type Output = Matrix<T, R, K>;
+
+
+    fn mul(self, other: Matrix<T, C, K>) -> Matrix<T, R, K> {
+        self.multiply(other)
+    }
+}
+
+
+impl<T: MatrixCell<T>, const R: usize, const C: usize> Mul<T> for Matrix<T, R, C> {
+    type Output = Matrix<T, R, C>;
+
+
+    fn mul(self, other: T) -> Matrix<T, R, C> {
+        self.multiply_scalar(other)
     }
 }
 
