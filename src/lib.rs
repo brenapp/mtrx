@@ -50,13 +50,13 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// ```
     /// use mtrx::Matrix;
     /// 
-    /// let a = Matrix::new([1, 2], [3, 4]);
-    /// let b= Matrix::new([1, 2, 3], [3, 4, 5]);
-    /// assert!(a.is_square())
-    /// assert!(b.is_square())
+    /// let a = Matrix::new([[1, 2], [3, 4]]);
+    /// let b = Matrix::new([[1, 2, 3], [3, 4, 5]]);
+    /// assert!(a.is_square());
+    /// assert!(!b.is_square());
     /// 
     /// ```
-    pub const fn is_square() -> bool {
+    pub const fn is_square(&self) -> bool {
         R == C
     }
     
@@ -122,15 +122,25 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// 
     /// # Examples
     /// ```
-    /// use mtrx:Matrix
+    /// use mtrx::Matrix;
     /// 
-    /// let matrix = Matrix::new(
-    ///     [[1, 1], [2, 2]]
+    /// let matrix_a = Matrix::new(
+    ///     [[1, 2, 3], 
+    ///     [4, 5, 6]]
     /// );
+    ///
+    /// let matrix_b = Matrix::new(
+    ///     [[7,  8],
+    ///      [9,  10], 
+    ///      [11, 12]]
+    /// );
+    ///
+    /// let result = matrix_a.multiply_matrix(matrix_b);
+    /// assert_eq!(result.inner, [[58, 64], [139, 154]]); 
     ///  
     /// ```
     /// 
-    pub fn multiply<const K: usize>(&self, matrix: Matrix<T, C, K>) -> Matrix<T, R, K> {
+    pub fn multiply_matrix<const K: usize>(&self, matrix: Matrix<T, C, K>) -> Matrix<T, R, K> {
 
         // Initialize a default array (the default values are just placeholders)
         let mut inner = [[0.into(); K]; R];
@@ -170,7 +180,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 
         for r in 0..R {
             for c in 0..C {
-                inner[r][c] = self.inner[c][r];
+                inner[c][r] = self.inner[r][c];
             }
         }
 
@@ -377,7 +387,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize, const K: usize> Mul<Matri
 
 
     fn mul(self, other: Matrix<T, C, K>) -> Matrix<T, R, K> {
-        self.multiply(other)
+        self.multiply_matrix(other)
     }
 }
 
@@ -413,7 +423,7 @@ mod tests {
     }
 
     #[test]
-    pub fn multiply() {
+    pub fn multiply_matrix() {
 
         let matrix_a = Matrix::new(
             [[1, 2, 3], 
@@ -427,7 +437,7 @@ mod tests {
             ]
         );
 
-        let result = matrix_a.multiply(matrix_b);
+        let result = matrix_a.multiply_matrix(matrix_b);
         assert_eq!(result.inner, 
             [[58, 64], 
              [139, 154]]
