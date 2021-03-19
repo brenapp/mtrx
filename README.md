@@ -32,5 +32,12 @@ assert_eq!(result.inner,
      [139, 154]]
 ); 
 
+
+let result = matrix_a * matrix_b;
+assert_eq!(result.inner, 
+    [[58, 64], 
+     [139, 154]]
+); 
+
 ```
 
