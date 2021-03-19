@@ -1,8 +1,10 @@
 #![feature(const_fn)]
+#![feature(generic_associated_types)]
+
+use std::{ops::{Add, AddAssign, Mul, Sub, SubAssign, Index}, slice::SliceIndex};
 
 /// Represents a mathematical matrix, with dimensions known at compile time due to const generics
 
-use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
 
 /// The requirements for a type to be a Matrix Cell. Numeric types fulfill these
 /// requirements, and many of them can be derived as needed 
@@ -173,6 +175,22 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// | 2 4 6 |
     /// 
     /// Returns the transposed Matrix<C, R>
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// 
+    /// let matrix = Matrix::new(
+    ///     [[1, 2, 3], 
+    ///     [4, 5, 6]]
+    /// );
+    /// 
+    /// let transposed = matrix.transpose();
+    /// 
+    /// assert_eq!(transposed.inner, [[1, 4], [2, 5], [3, 6]])
+    /// 
+    /// ```
     ///  
     pub fn transpose(&self) -> Matrix<T, C, R> {
 
@@ -190,7 +208,28 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     }
 
 
-    /// Adds two matrices of the same size and returns the sum matrix (also the same size)
+    /// Adds two matrices of the same size and returns the sum matrix (also the same size).
+    /// Additionally you can also use the + operator to add matrices together;
+    /// 
+    /// # Arguments
+    /// 
+    /// * 'other' - Same same sized matrix to add
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// 
+    /// let matrix_a = Matrix::new([[1, 2], [3, 4]]);
+    /// let matrix_b = Matrix::new([[3, 2], [1, 0]]);
+    /// 
+    /// let sum = matrix_a.add_matrix(matrix_b);
+    /// assert_eq!(matrix.inner, [[4, 4], [4, 4]]);
+    /// 
+    /// let sum = matrix_a + matrix_b;
+    /// assert_eq!(matrix.inner, [[4, 4], [4, 4]]);
+    /// 
+    /// ```
     pub fn add_matrix(&self, other: Matrix<T, R, C>) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -203,7 +242,26 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
         Matrix { inner }
     }
 
-    /// Adds a single value to all cells in the matrix and returns the sum matrix
+    /// Adds a single value to all cells in the matrix and returns the sum matrix. Additionally, you
+    /// can use the plus operator to add a value to the matrix
+    /// 
+    /// # Arguments
+    /// 
+    /// * 'other' - The value T to add to all the cell
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// let matrix_a = Matrix::new([[1, 2], [3, 4]]);
+    /// 
+    /// let sum = matrix_a.add_value(10);
+    /// assert_eq!(sum.inner, [[11, 12], [13, 14]]);
+    /// 
+    /// let sum = matrix_a + 10;
+    /// assert_eq!(sum.inner, [[11, 12], [13, 14]]);
+    /// 
+    /// ```
     pub fn add_value(&self, other: T) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -216,7 +274,28 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
         Matrix { inner }
     }
 
-    /// Adds two matrices of the same size and returns the resultant matrix (also the same size)
+    /// Subtracts two matrices of the same size and returns the difference matrix (also the same size).
+    /// Additionally you can also use the - operator to subtract matrices.
+    /// 
+    /// # Arguments
+    /// 
+    /// * 'other' - Same same sized matrix to subtract
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// 
+    /// let matrix_a = Matrix::new([[1, 2], [3, 4]]);
+    /// let matrix_b = Matrix::new([[0, 1], [2, 3]]);
+    /// 
+    /// let difference = matrix_a.sub_matrix(matrix_b);
+    /// assert_eq!(matrix.inner, [1, 1], [1, 1]]);
+    /// 
+    /// let difference = matrix_a - matrix_b;
+    /// assert_eq!(matrix.inner, [1, 1], [1, 1]]);
+    /// 
+    /// ```
     pub fn sub_matrix(&self, other: Matrix<T, R, C>) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -229,7 +308,26 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
         Matrix { inner }
     }
 
-    /// Adds a single value to all cells in the matrix and returns the sum matrix
+    /// Subtracts a single value to all cells in the matrix and returns the difference matrix. Additionally, you
+    /// can use the - operator to add a value to the matrix
+    /// 
+    /// # Arguments
+    /// 
+    /// * 'other' - The value T to subtract from each cell
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// let matrix_a = Matrix::new([[1, 2], [3, 4]]);
+    /// 
+    /// let sum = matrix_a.sub_value(1);
+    /// assert_eq!(sum.inner, [[0, 1], [2, 3]]);
+    /// 
+    /// let sum = matrix_a - 1;
+    /// assert_eq!(sum.inner, [[0, 1], [2, 3]]);
+    /// 
+    /// ```
     pub fn sub_value(&self, other: T) -> Matrix<T, R, C> {
         let mut inner = self.inner.clone();
 
@@ -244,6 +342,8 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 
 
     /// Multiplies a matrix by a vector (const-sized array) and returns the matrix vector product.  
+    /// 
+    /// Matrix-vector product is a specialized form of 
     pub fn vector_product(&self, other: [T; C]) -> [T; R] {
 
         let mut values = [0.into(); R];
@@ -259,7 +359,12 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     } 
 
     /// Returns a non-mutable reference to the cell at the specified row and column
-    pub fn get(&self, row: usize, col: usize) -> Option<&T> {
+    /// 
+    /// Note: typical mathematical notation for matrices is for 1-indexing. However, in order to be
+    /// consistent, this function is zero-indexed.
+    /// 
+    /// 
+    pub const fn get(&self, row: usize, col: usize) -> Option<&T> {
 
         if row < R && col < C {
             Some(&self.inner[row][col])
@@ -298,6 +403,34 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 /// Some matrix operations are only valid for square matrices
 impl<T: MatrixCell<T>, const R: usize> Matrix<T, R, R> {
 
+    /// Returns the identity matrix for a RxR matrix. The identity matrix is the matrix with 1 in a
+    /// diagonal line down the matrix, and a zero everywhere else. For example, the 3x3 identity
+    /// matrix is:
+    /// 
+    /// 1 0 0
+    /// 
+    /// 0 1 0
+    /// 
+    /// 0 0 1
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// 
+    /// let identity: Matrix<i32, 2, 2> = Matrix::identity();
+    /// assert_eq!(identity.inner, [[1, 0], [0, 1]]);
+    /// 
+    /// ```
+    /// 
+    /// Identity matrices cannot be created with non-square const generic sizes:
+    /// 
+    /// ```compile_fail
+    /// use mtrx::Matrix;
+    /// 
+    /// let identity: Matrix<i32, 3, 2> = Matrix::identity(); // Compiler Error!
+    /// 
+    /// ```
     pub fn identity() -> Matrix<T, R, R> {
 
         let mut inner = [[0.into(); R]; R];
@@ -313,6 +446,25 @@ impl<T: MatrixCell<T>, const R: usize> Matrix<T, R, R> {
         Matrix { inner }
     }
 
+    /// Raises a square matrix to a power (essentially, multiplying itself exp times). Raising a
+    /// matrix to the zeroth power returns [Matrix::identity]
+    /// 
+    /// # Arguments
+    /// 
+    /// * 'exp' - Exponent
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use mtrx::Matrix;
+    /// 
+    /// let matrix = Matrix::new([1, -3], [2, 5]);
+    /// let result = matrix.pow(2);
+    /// 
+    /// assert_eq!(result.inner, [[-5, -18], [12, 19]])
+    /// 
+    /// 
+    /// ```
     pub fn pow(&self, exp: usize) -> Matrix<T, R, R> {
 
         // By convention matrix to the power of zero is the identity matrix
@@ -400,6 +552,14 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Mul<T> for Matrix<T, R, C
     }
 }
 
+impl<T: MatrixCell<T>, const R: usize, const C: usize> Mul<[T; C]> for Matrix<T, R, C> {
+    type Output = [T; R];
+
+    fn mul(self, other: [T; C]) -> [T; R] {
+        self.vector_product(other)
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -460,5 +620,14 @@ mod tests {
             [1, 4], [2, 5], [3, 6]])
 
     }   
+
+    #[test]
+    pub fn get() {
+
+        let matrix = Matrix::new([[1, 2], [3, 4]]);
+
+        let value = matrix.get(0, 0);
+
+    }
 
 }
