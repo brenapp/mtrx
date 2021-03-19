@@ -8,8 +8,11 @@ Supported Operations
 - Subtraction
 - Scalar Multiplication
 - Matrix Multiplication
+- Matrix Vector Product
 - Transposition
 - Matrix Powers
+
+> **Note: currently, mtrx requires Nightly to work, as it makes use of the `#![feature(const_fn)]`**
 
 ```Rust
 let matrix_a = Matrix::new(
@@ -30,3 +33,4 @@ assert_eq!(result.inner,
 ); 
 
 ```
+
