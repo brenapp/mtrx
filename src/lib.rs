@@ -371,7 +371,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 
         for r in 0..R {
             for c in 0..C {
-                values[r] += other[c]
+                values[r] += self.inner[r][c] * other[c]
             }
         }
 
@@ -587,6 +587,7 @@ impl<T: MatrixCell<T>, const R: usize> Matrix<T, R, R> {
 }
 
 /// Trait Implementations
+/// See method descriptions above for more details
 
 impl<T: MatrixCell<T>, const R: usize, const C: usize> Add for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
@@ -611,17 +612,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
     
     fn sub(self, other: Self) -> Self {
-        
-        let mut inner = self.inner.clone();
-
-        for r in 0..R {
-            for c in 0..C {
-                inner[r][c] -= other.inner[r][c];
-            }
-        }
-
-        Matrix { inner }
-
+        self.sub_matrix(other)
     }
 }
 
@@ -637,7 +628,6 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub<T> for Matrix<T, R, C
 
 impl<T: MatrixCell<T>, const R: usize, const C: usize, const K: usize> Mul<Matrix<T, C, K>> for Matrix<T, R, C> {
     type Output = Matrix<T, R, K>;
-
 
     fn mul(self, other: Matrix<T, C, K>) -> Matrix<T, R, K> {
         self.multiply_matrix(other)
