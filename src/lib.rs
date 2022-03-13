@@ -2,22 +2,22 @@ use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
 
 /// The requirements for a type to be a Matrix Cell. Numeric types fulfill these
 /// requirements, and many of them can be derived as needed
-pub trait MatrixCell<T>:
-    Add<Output = T> + Mul<Output = T> + AddAssign + SubAssign + Copy + From<i8>
+pub trait MatrixCell:
+    Add<Output = Self> + Mul<Output = Self> + AddAssign + SubAssign + Copy + From<i8>
 {
 }
-impl<T: Add<Output = T> + Mul<Output = T> + AddAssign + SubAssign + Copy + From<i8>> MatrixCell<T>
+impl<T: Add<Output = T> + Mul<Output = T> + AddAssign + SubAssign + Copy + From<i8>> MatrixCell
     for T
 {
 }
 
 /// Uses const generics to represent a mathematical matrix
 #[derive(Copy, Clone)]
-pub struct Matrix<T: MatrixCell<T>, const R: usize, const C: usize> {
+pub struct Matrix<T: MatrixCell, const R: usize, const C: usize> {
     pub inner: [[T; C]; R],
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Matrix<T, R, C> {
     /// Creates a new Matrix of the given size
     ///
     /// # Arguments
@@ -475,7 +475,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
 }
 
 /// Some matrix operations are only valid for square matrices
-impl<T: MatrixCell<T>, const R: usize> Matrix<T, R, R> {
+impl<T: MatrixCell, const R: usize> Matrix<T, R, R> {
     /// Returns the identity matrix for a RxR matrix. The identity matrix is the matrix with 1 in a
     /// diagonal line down the matrix, and a zero everywhere else. For example, the 3x3 identity
     /// matrix is:
@@ -561,7 +561,7 @@ impl<T: MatrixCell<T>, const R: usize> Matrix<T, R, R> {
 /// Trait Implementations
 /// See method descriptions above for more details
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Add for Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Add for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
 
     fn add(self, other: Self) -> Self {
@@ -569,7 +569,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Add for Matrix<T, R, C> {
     }
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Add<T> for Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Add<T> for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
 
     fn add(self, other: T) -> Self {
@@ -577,7 +577,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Add<T> for Matrix<T, R, C
     }
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub for Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Sub for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
 
     fn sub(self, other: Self) -> Self {
@@ -585,7 +585,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub for Matrix<T, R, C> {
     }
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub<T> for Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Sub<T> for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
 
     fn sub(self, other: T) -> Self {
@@ -593,7 +593,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Sub<T> for Matrix<T, R, C
     }
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize, const K: usize> Mul<Matrix<T, C, K>>
+impl<T: MatrixCell, const R: usize, const C: usize, const K: usize> Mul<Matrix<T, C, K>>
     for Matrix<T, R, C>
 {
     type Output = Matrix<T, R, K>;
@@ -603,7 +603,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize, const K: usize> Mul<Matri
     }
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Mul<T> for Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Mul<T> for Matrix<T, R, C> {
     type Output = Matrix<T, R, C>;
 
     fn mul(self, other: T) -> Matrix<T, R, C> {
@@ -611,7 +611,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Mul<T> for Matrix<T, R, C
     }
 }
 
-impl<T: MatrixCell<T>, const R: usize, const C: usize> Mul<[T; C]> for Matrix<T, R, C> {
+impl<T: MatrixCell, const R: usize, const C: usize> Mul<[T; C]> for Matrix<T, R, C> {
     type Output = [T; R];
 
     fn mul(self, other: [T; C]) -> [T; R] {
