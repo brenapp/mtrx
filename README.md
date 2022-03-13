@@ -12,8 +12,6 @@ Supported Operations
 - Transposition
 - Matrix Powers
 
-> **Note: currently, mtrx requires Nightly to work, as it makes use of the `#![feature(const_fn)]`**
-
 ```Rust
 let matrix_a = Matrix::new(
     [[1, 2, 3], 
