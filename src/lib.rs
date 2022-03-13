@@ -1,5 +1,3 @@
-#![feature(const_fn)]
-
 use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
 
 /// The requirements for a type to be a Matrix Cell. Numeric types fulfill these
@@ -54,7 +52,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// assert!(!b.is_square());
     /// 
     /// ```
-    pub const fn is_square(&self) -> bool {
+    pub fn is_square(&self) -> bool {
         R == C
     }
     
@@ -408,7 +406,7 @@ impl<T: MatrixCell<T>, const R: usize, const C: usize> Matrix<T, R, C> {
     /// 
     /// ```
     /// 
-    pub const fn get(&self, row: usize, col: usize) -> Option<&T> {
+    pub fn get(&self, row: usize, col: usize) -> Option<&T> {
 
         if row < R && col < C {
             Some(&self.inner[row][col])
